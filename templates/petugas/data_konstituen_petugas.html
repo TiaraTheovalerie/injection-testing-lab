@@ -1,0 +1,190 @@
+{% extends 'petugas/layout_petugas.html' %}
+
+{% block title %}Data Konstituen - SIPECAL{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        /* Mengambil variabel dari layout_petugas.html */
+        --navy: #1e293b; 
+        --green-primary: #059669; 
+        --border: #e2e8f0;
+        --light-bg: #f8fafc;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+    }
+
+    .dashboard-wrapper { padding: 20px; font-family: 'Roboto', sans-serif; }
+
+    /* HEADER - Border diganti Hijau */
+    .dashboard-header { margin-bottom: 25px; border-left: 6px solid var(--green-primary); padding-left: 15px; }
+    .page-title { color: var(--navy); font-family: 'Montserrat', sans-serif; font-weight: 800; text-transform: uppercase; margin: 0; }
+    .page-subtitle { color: var(--text-muted); font-size: 0.85rem; }
+
+    /* TOOLBAR FORM */
+    .data-toolbar-form {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        gap: 15px;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .search-box { position: relative; flex: 1; min-width: 250px; }
+    .search-box i {
+        position: absolute; left: 12px; top: 50%;
+        transform: translateY(-50%); color: var(--text-muted);
+    }
+    .search-box input {
+        width: 100%; padding: 10px 10px 10px 35px;
+        border: 1px solid var(--border); border-radius: 4px; outline: none;
+    }
+
+    .filter-group { display: flex; gap: 10px; align-items: center; }
+    .admin-select-sm {
+        padding: 10px 12px; border: 1px solid var(--border);
+        border-radius: 4px; background: white; font-size: 0.85rem;
+    }
+
+    /* BUTTON - Warna Navy & Hijau */
+    .btn-main {
+        background: var(--navy); color: white; padding: 10px 15px;
+        text-decoration: none; border-radius: 6px; font-weight: bold;
+        font-size: 0.85rem; display: flex; align-items: center; gap: 8px;
+        transition: 0.3s; border: none; cursor: pointer;
+    }
+    .btn-main:hover { background: var(--green-primary); color: white; }
+    .btn-reset { background: #f1f5f9; color: var(--text-muted); }
+
+    /* TABLE STYLING */
+    .table-container {
+        background: white; border: 1px solid var(--border);
+        overflow-x: auto; border-radius: 8px;
+    }
+    .admin-table { width: 100%; border-collapse: collapse; text-align: left; min-width: 900px; }
+    .admin-table th {
+        background: var(--navy); color: white; padding: 15px;
+        font-size: 0.8rem; font-weight: 800; text-transform: uppercase; 
+        font-family: 'Montserrat', sans-serif;
+        border-bottom: 2px solid var(--green-primary);
+    }
+    .admin-table td { padding: 15px; border-bottom: 1px solid var(--border); font-size: 0.9rem; color: var(--text-main); }
+    .text-center { text-align: center !important; }
+
+    /* AKSI BUTTONS - Warna Soft Green & Red */
+    .action-flex { display: flex; gap: 8px; justify-content: center; align-items: center; }
+    .btn-action {
+        padding: 6px 12px; border-radius: 4px; font-size: 0.75rem;
+        font-weight: 700; text-decoration: none; display: flex;
+        align-items: center; gap: 5px; transition: 0.2s;
+    }
+    .btn-action.edit { background: #dcfce7; color: #166534; } /* Soft Green */
+    .btn-action.delete { background: #fee2e2; color: #b91c1c; } /* Soft Red */
+    .btn-action:hover { opacity: 0.8; transform: translateY(-1px); }
+
+    /* RESPONSIVE */
+    @media (max-width: 600px) {
+        .data-toolbar-form { flex-direction: column; align-items: stretch; }
+        .search-box { min-width: 0; }
+        .filter-group { flex-wrap: wrap; justify-content: center; }
+        .btn-main span { display: none; } 
+    }
+</style>
+
+<div class="dashboard-wrapper">
+    <header class="dashboard-header">
+        <h3 class="page-title">Database Konstituen</h3>
+        <p class="page-subtitle">Daftar lengkap pendukung terverifikasi</p>
+    </header>
+
+    <form action="{{ url_for('petugas.data_konstituen_petugas') }}" method="GET" class="data-toolbar-form">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" name="q" placeholder="Cari Nama atau NIK..." value="{{ search_query or '' }}">
+        </div>
+    
+        <div class="filter-group">
+            <select name="kecamatan" class="admin-select-sm" onchange="this.form.submit()">
+                <option value="">Semua Kecamatan</option>
+                {% for k in kecamatan %}
+                <option value="{{ k.id_kecamatan }}" {{ 'selected' if filter_kecamatan|string == k.id_kecamatan|string else '' }}>
+                    {{ k.nama_kecamatan }}
+                </option>
+                {% endfor %}
+            </select>
+    
+            {% if search_query or filter_kecamatan %}
+            <a href="{{ url_for('petugas.data_konstituen_petugas') }}" class="btn-main btn-reset" title="Hapus Filter">
+                <i class="fas fa-sync-alt"></i>
+            </a>
+            {% endif %}
+    
+            <a href="{{ url_for('petugas.tambah_data_konstituen_petugas') }}" class="btn-main">
+                <i class="fas fa-plus"></i><span>Tambah Data</span>
+            </a>
+        </div>
+    </form>
+
+    <section class="table-container">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Nama Lengkap</th>
+                    <th>NIK</th>
+                    <th>Kecamatan</th>
+                    <th>Relawan</th>
+                    <th>Tgl Input</th> 
+                    <th class="text-center">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for person in konstituen %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td style="font-weight: 700;">{{ person.nama }}</td>
+                    <td>{{ person.nik }}</td>
+                    <td>{{ person.nama_kecamatan }}</td>
+                    <td>
+                        {% if person.nama_relawan %}
+                            <span style="font-size: 0.75rem; color: #065f46; background: #dcfce7; padding: 3px 8px; border-radius: 12px; font-weight: bold; border: 1px solid #bbf7d0;">
+                                <i class="fas fa-user-check"></i> {{ person.nama_relawan }}
+                            </span>
+                        {% else %}
+                            <span style="font-size: 0.75rem; color: var(--green-primary); background: #ecfdf5; padding: 3px 6px; border-radius: 4px; font-weight: bold;">
+                                    {{ person.nama_relawan or 'Admin' }}
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td style="font-size: 0.85rem; color: #64748b;">
+                        {% if person.tanggal_tampil %}
+                            <i class="far fa-clock" style="color: #059669;"></i> 
+                            {# Jika tanggal_tampil adalah objek datetime/date #}
+                            {{ person.tanggal_tampil.strftime('%d %b %Y') if person.tanggal_tampil.strftime else person.tanggal_tampil }}
+                        {% else %}
+                            <span style="opacity: 0.5;">Belum Tercatat</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="action-flex">
+                            <a href="{{ url_for('petugas.edit_konstituen_petugas', id=person.id_pendukung) }}" class="btn-action edit">
+                                <i class="fas fa-edit"></i><span>Edit</span>
+                            </a>
+                            <a href="{{ url_for('petugas.konfirmasi_hapus_konstituen', id=person.id_pendukung) }}" class="btn-action delete">
+                                <i class="fas fa-trash"></i><span>Hapus</span>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <footer style="margin-top: 20px; color: var(--text-muted); font-size: 0.75rem;">
+        Total: <strong>{{ konstituen|length }}</strong> data ditemukan
+    </footer>
+</div>
+{% endblock %}

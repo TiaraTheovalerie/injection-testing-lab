@@ -1,0 +1,267 @@
+{% extends 'admin/layout_admin.html' %}
+
+{% block title %}Dashboard Admin{% endblock %}
+
+{% block content %}
+<style>
+    /* VARIABLES & RESET */
+    :root {
+        --navy: #1e1b4b;
+        --red: #b91c1c;
+        --green: #059669;
+        --light-bg: #f8fafc;
+        --border-color: #e2e8f0;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+    }
+
+    .dashboard-wrapper {
+        padding: 10px;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    /* HEADER */
+    .dashboard-header {
+        margin-bottom: 25px;
+        border-left: 6px solid var(--red);
+        padding-left: 15px;
+    }
+
+    .page-title {
+        color: var(--navy);
+        font-weight: 800;
+        font-size: 1.3rem;
+        margin: 0;
+        text-transform: uppercase;
+    }
+
+    /* STATS GRID */
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 20px;
+        border: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 4px;
+        transition: 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+    .border-navy { border-top: 4px solid var(--navy); }
+    .border-green { border-top: 4px solid var(--green); }
+    .border-red { border-top: 4px solid var(--red); }
+
+    .stat-label { font-size: 0.7rem; font-weight: 800; color: var(--text-muted); display: block; }
+    .stat-number { font-size: 1.8rem; font-weight: 900; color: var(--navy); margin: 5px 0; }
+    .stat-sub { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
+
+    /* PROGRESS BAR */
+    .progress-bar-container { background: #e2e8f0; height: 8px; border-radius: 4px; margin: 10px 0; width: 100%; overflow: hidden; }
+    .progress-fill { background: var(--green); height: 100%; border-radius: 4px; transition: 1.5s ease-in-out; }
+
+    .alert-badge { background: var(--red); color: white; padding: 4px 10px; font-size: 0.65rem; font-weight: 800; border-radius: 4px; display: inline-block; }
+    .pulse { animation: shadow-pulse 2s infinite; }
+    @keyframes shadow-pulse { 0% { box-shadow: 0 0 0 0px rgba(185, 28, 28, 0.4); } 100% { box-shadow: 0 0 0 10px rgba(185, 28, 28, 0); } }
+
+    /* COMMAND PANEL */
+    .command-panel { background: white; border: 1px solid var(--border-color); padding: 20px; border-radius: 4px; }
+    .panel-header h4 { color: var(--navy); font-weight: 800; margin-bottom: 20px; font-size: 0.95rem; display: flex; align-items: center; gap: 10px; }
+
+    /* INPUT FORM */
+    .command-input-area { background: var(--light-bg); border: 2px dashed #cbd5e1; padding: 20px; margin-bottom: 25px; border-radius: 4px; }
+    .form-row { display: flex; gap: 15px; flex-wrap: wrap; }
+    .col-small { flex: 1; min-width: 100%; } 
+    .col-large { flex: 2; min-width: 100%; }
+
+    @media (min-width: 768px) {
+        .col-small { min-width: 200px; }
+        .col-large { min-width: 400px; }
+        .dashboard-wrapper { padding: 20px; }
+    }
+
+    .admin-select, .admin-textarea {
+        width: 100%; padding: 12px; border: 1px solid #cbd5e1; background: white; font-size: 0.9rem; border-radius: 4px; outline: none;
+    }
+    .admin-textarea { resize: vertical; min-height: 100px; }
+
+    .btn-send { 
+        background: var(--navy); color: white; border: none; padding: 12px 25px; font-weight: 800; font-size: 0.8rem; cursor: pointer; transition: 0.3s; width: 100%; border-radius: 4px;
+    }
+    @media (min-width: 600px) { .btn-send { width: auto; } }
+    .btn-send:hover { background: var(--red); }
+
+    /* HISTORY LIST */
+    .history-card { padding: 15px; border: 1px solid var(--border-color); margin-bottom: 15px; background: white; border-radius: 4px; }
+    .history-card.urgent { border-left: 6px solid var(--red); }
+    .history-card.info { border-left: 6px solid #3b82f6; }
+
+    .card-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .time-stamp { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; }
+    .tag-urgent { background: var(--red); color: white; font-size: 0.6rem; font-weight: 900; padding: 2px 8px; border-radius: 3px; }
+    .tag-info { background: #3b82f6; color: white; font-size: 0.6rem; font-weight: 900; padding: 2px 8px; border-radius: 3px; }
+
+    .card-content { 
+        font-size: 0.9rem; 
+        line-height: 1.5; 
+        color: var(--text-main);
+        /* PERBAIKAN: Agar teks tidak menyamping dan mendukung pindah baris */
+        white-space: pre-line; 
+    }
+    
+    .card-footer { display: flex; gap: 15px; margin-top: 15px; border-top: 1px solid #f1f5f9; padding-top: 12px; justify-content: flex-end; }
+    .btn-delete { background: none; border: none; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); cursor: pointer; text-decoration: none; }
+    .btn-delete:hover { color: var(--red); }
+
+    .view-all-link {
+        text-decoration: none;
+        color: var(--navy);
+        font-size: 0.8rem;
+        font-weight: 700;
+        transition: 0.3s;
+    }
+
+    .view-all-link:hover {
+        color: var(--red);
+        text-decoration: underline;
+    }
+</style>
+
+<div class="dashboard-wrapper">
+    <header class="dashboard-header">
+        <h3 class="page-title">Dashboard Admin</h3>
+    </header>
+
+    <section class="stats-container">
+        <div class="stat-card border-navy">
+            <div class="stat-main">
+                <span class="stat-label">TARGET SUARA</span>
+                <h2 class="stat-number">{{ target|default(0) }}</h2>
+                <span class="stat-sub">Konstituen Terdata</span>
+            </div>
+            <div class="stat-visual"><i class="fas fa-bullseye" style="font-size: 2.5rem; opacity: 0.1; color: var(--navy);"></i></div>
+        </div>
+
+        <div class="stat-card border-green">
+            <div class="stat-main" style="width: 100%;">
+                <span class="stat-label">DUKUNGAN MASUK</span>
+                <h2 class="stat-number">{{ "{:,}".format(masuk|default(0)) }}</h2>
+                <div class="progress-bar-container">
+                    <div class="progress-fill" style="width: {{ persen|default(0) }}%;"></div>
+                </div>
+                <span class="stat-sub">{{ persen|default(0) }}% dari Target</span>
+            </div>
+        </div>
+
+        <div class="stat-card border-red">
+            <div class="stat-main">
+                <span class="stat-label">H-VOTING DAY</span>
+                <h2 class="stat-number">45</h2>
+                <span class="alert-badge pulse">SIAGA SATU</span>
+            </div>
+            <div class="stat-visual"><i class="fas fa-clock" style="font-size: 2.5rem; opacity: 0.1; color: var(--navy);"></i></div>
+        </div>
+    </section>
+
+    <section class="command-panel">
+        <div class="command-input-area">
+            <div class="panel-header">
+                <h4><i class="fas fa-broadcast-tower"></i> BROADCAST INSTRUKSI</h4>
+            </div>
+            
+            <form action="{{ url_for('admin.kirim_instruksi') }}" method="POST" class="broadcast-form">
+                <div class="form-row">
+                    <div class="form-group col-small">
+                        <label style="font-size: 0.7rem; font-weight: 800; color: var(--navy);">KATEGORI</label>
+                        <select name="kategori" class="admin-select" required>
+                            <option value="info">INFORMASI (Pesan Biru)</option>
+                            <option value="urgent">URGENT (Pesan Merah)</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-large">
+                        <label style="font-size: 0.7rem; font-weight: 800; color: var(--navy);">ISI PESAN</label>
+                        <textarea name="pesan" class="admin-textarea" placeholder="Ketik perintah harian... (Gunakan Enter untuk baris baru)" required></textarea>
+                    </div>
+                </div>
+                <div class="form-actions" style="display: flex; justify-content: flex-end; margin-top: 15px;">
+                    <button type="submit" class="btn-send">
+                        KIRIM INSTRUKSI <i class="fas fa-paper-plane" style="margin-left: 5px;"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="panel-header">
+            <h4><i class="fas fa-history"></i> RIWAYAT PESAN</h4>
+        </div>
+
+        <div class="history-list">
+            {% for log in logs %}
+            <article class="history-card {{ 'urgent' if log.kategori == 'urgent' else 'info' }}">
+                <div class="card-meta">
+                    <span class="time-stamp">
+                        <i class="far fa-clock"></i> 
+                        {% if log.tanggal_kirim %}
+                            {{ log.tanggal_kirim.strftime('%d %b %Y | %H:%M') }} WIB
+                        {% else %}
+                            Waktu tidak terdata
+                        {% endif %}
+                    </span>
+                    <span class="{{ 'tag-urgent' if log.kategori == 'urgent' else 'tag-info' }}">
+                        {{ log.kategori|upper }}
+                    </span>
+                </div>
+                <div class="card-content">{{ log.isi_pesan }}</div>
+                <div class="card-footer">
+                    <a href="{{ url_for('admin.hapus_instruksi', id=log.id_instruksi) }}" class="btn-delete">
+                        <i class="fas fa-trash"></i> Hapus
+                    </a>
+                </div>
+            </article>
+            {% else %}
+            <div style="text-align: center; padding: 40px; color: var(--text-muted); background: white; border: 1px dashed var(--border-color); border-radius: 4px;">
+                <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 10px; opacity: 0.5;"></i>
+                <p>Belum ada instruksi yang dikirim.</p>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="archive-link" style="margin-top: 20px;">
+            <a href="{{ url_for('admin.riwayat_instruksi_admin') }}" class="view-all-link">
+                LIHAT SELURUH RIWAYAT PESAN →
+            </a>
+        </div>
+    </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.querySelector('.broadcast-form').addEventListener('submit', function(e) {
+    var form = this;
+    e.preventDefault();
+    Swal.fire({
+        title: 'Konfirmasi Pengiriman',
+        text: "Instruksi akan segera dikirimkan ke seluruh petugas, lanjutkan?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#1e1b4b',
+        cancelButtonColor: '#b91c1c',
+        confirmButtonText: 'Ya, Kirim',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            form.submit();
+        }
+    });
+});
+</script>
+{% endblock %}

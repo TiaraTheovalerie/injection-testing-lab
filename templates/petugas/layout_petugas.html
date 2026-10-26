@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Aplikasi Petugas - SIPECAL{% endblock %}</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+          --primary-green: #059669; 
+          --navy-power: #1e293b;   
+          --gold-win: #fbbf24; 
+          --white: #ffffff;
+          --bg-light: #f8fafc;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Roboto', sans-serif;
+          background-color: var(--bg-light);
+          display: flex;
+          min-height: 100vh;
+          flex-direction: column;
+        }
+
+        @media (min-width: 992px) {
+            body { flex-direction: row; }
+            aside { width: 300px; position: fixed; height: 100vh; }
+            main { margin-left: 300px; }
+            .mobile-logout { display: none !important; } /* Sembunyikan di desktop */
+        }
+
+        /* Sidebar - Desain Asli Kamu */
+        aside {
+          background: var(--navy-power);
+          color: var(--white);
+          z-index: 100;
+          box-shadow: 4px 0 10px rgba(0,0,0,0.2);
+        }
+
+        .caleg-profile {
+          padding: 2rem 1.5rem;
+          text-align: center;
+          background: linear-gradient(to bottom, rgba(0,0,0,0.3), transparent);
+          border-bottom: 2px solid var(--primary-green);
+        }
+
+        .caleg-photo {
+          width: 80px; height: 80px;
+          border-radius: 50%;
+          border: 3px solid var(--primary-green);
+          margin-bottom: 1rem;
+          object-fit: cover;
+          background: #eee;
+        }
+
+        .caleg-info h2 {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 1rem;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+        }
+
+        .caleg-info p {
+          font-size: 0.7rem;
+          color: var(--primary-green);
+          font-weight: 700;
+          margin-top: 5px;
+        }
+
+        nav { padding: 1rem 0; }
+        nav a {
+          display: flex; align-items: center;
+          padding: 1rem 1.5rem;
+          color: #cbd5e1;
+          text-decoration: none;
+          font-weight: 500;
+          transition: 0.2s;
+          border-left: 5px solid transparent;
+        }
+
+        nav a i { width: 30px; font-size: 1.2rem; }
+        nav a:hover, nav a.active {
+          background: rgba(255,255,255,0.05);
+          color: var(--white);
+          border-left: 5px solid var(--primary-green);
+        }
+
+        /* Tombol Keluar Asli Merah */
+        .logout-btn {
+          background: #ef4444 !important;
+          color: white !important;
+          border-radius: 4px;
+          font-weight: 800 !important;
+          text-align: center;
+          justify-content: center;
+          text-decoration: none;
+          display: flex;
+          align-items: center;
+        }
+
+        /* Main Content */
+        main { flex-grow: 1; padding: 0; }
+        .header-banner {
+          background: var(--primary-green); 
+          color: white;
+          padding: 1.5rem 2rem;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png'); 
+        }
+
+        .slogan {
+          font-family: 'Montserrat', sans-serif;
+          font-style: italic;
+          font-weight: 800;
+          font-size: 1rem;
+          text-transform: uppercase;
+        }
+
+        .container-fluid { padding: 1.5rem; }
+        @media (min-width: 768px) { .container-fluid { padding: 2.5rem; } }
+
+        .content-card {
+          background: white;
+          border-radius: 4px;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+          border-top: 6px solid var(--primary-green);
+          padding: 1.5rem;
+          min-height: 400px;
+        }
+
+        footer { padding: 2rem; text-align: center; color: #64748b; font-weight: 600; font-size: 0.8rem; }
+
+        /* --- BAGIAN YANG DIUBAH: KHUSUS MOBILE MENU --- */
+        @media (max-width: 991px) {
+          aside { position: static; width: 100%; height: auto; }
+          
+          /* Profil di Kiri, Keluar di Kanan */
+          .caleg-profile { 
+              padding: 1rem 1.5rem; 
+              display: flex; 
+              align-items: center; 
+              justify-content: space-between; 
+              text-align: left;
+          }
+          
+          .profile-flex { display: flex; align-items: center; gap: 12px; }
+          .caleg-photo { width: 50px; height: 50px; margin-bottom: 0; }
+          .caleg-info h2 { font-size: 0.9rem; }
+          .caleg-info p { font-size: 0.65rem; }
+
+          /* Tombol Keluar HP */
+          .mobile-logout { padding: 0.5rem 1rem; font-size: 0.7rem; }
+
+          /* Navigasi Sebaris */
+          nav { display: flex; flex-wrap: wrap; justify-content: center; padding: 0.5rem; }
+          nav a { padding: 0.8rem; font-size: 0.75rem; border-left: none !important; border-bottom: 4px solid transparent; }
+          nav a.active { border-bottom: 4px solid var(--primary-green); }
+          
+          /* Sembunyikan logout nav di HP */
+          .desktop-logout { display: none !important; }
+        }
+    </style>
+    {% block head_extra %}{% endblock %}
+</head>
+<body>
+
+    <aside>
+        <div class="caleg-profile">
+            <div class="profile-flex">
+                <img src="https://ui-avatars.com/api/?name={{ session.nama }}&background=059669&color=fff" alt="Foto" class="caleg-photo">
+                <div class="caleg-info">
+                    <h2>{{ session.nama }}</h2>
+                    <p>PETUGAS LAPANGAN</p>
+                </div>
+            </div>
+
+            <a href="{{ url_for('logout') }}" class="logout-btn mobile-logout">
+                <i class="fas fa-sign-out-alt"></i> &nbsp; KELUAR
+            </a>
+        </div>
+
+        <nav>
+            <a href="{{ url_for('petugas.dashboard_petugas') }}" class="menu-item {{ 'active' if request.endpoint in ['petugas.dashboard_petugas'] else '' }}">
+                <i class="fas fa-th-large"></i> <span>DASHBOARD</span>
+            </a>
+            <a href="{{ url_for('petugas.data_konstituen_petugas') }}" class="menu-item {{ 'active' if request.endpoint in ['petugas.data_konstituen_petugas', 'petugas.tambah_data_konstituen_petugas', 'petugas.edit_konstituen_petugas', 'petugas.konfirmasi_hapus_konstituen'] else '' }}">
+                <i class="fas fa-user-plus"></i> <span>INPUT KONSTITUEN</span>
+            </a>
+            <a href="{{ url_for('petugas.daftar_dukungan_wilayah') }}" class="menu-item {{ 'active' if request.endpoint in ['petugas.daftar_dukungan_wilayah'] else '' }}">
+                <i class="fas fa-clipboard-list"></i> <span>DAFTAR DUKUNGAN</span>
+            </a>
+
+            <a href="{{ url_for('logout') }}" class="logout-btn desktop-logout" style="margin: 1rem 1.5rem; padding: 1rem;">
+                <i class="fas fa-sign-out-alt"></i> &nbsp; KELUAR
+            </a>
+        </nav>
+    </aside>
+
+    <main>
+        <div class="container-fluid">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            <i class="fas fa-info-circle"></i> {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="content-card">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+        <footer>
+            &copy; 2026 TIM PEMENANGAN CALEG - PANEL PETUGAS.
+        </footer>
+    </main>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

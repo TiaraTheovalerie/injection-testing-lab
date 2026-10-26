@@ -1,0 +1,154 @@
+{% extends 'admin/layout_admin.html' %}
+
+{% block title %}Manajemen Relawan - Admin Panel{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --navy: #1a237e;
+        --red: #d32f2f;
+        --border: #e2e8f0;
+        --text-dark: #1e293b;
+        --text-muted: #64748b;
+    }
+
+    .relawan-wrapper { padding: 25px; font-family: 'Inter', sans-serif; }
+
+    /* HEADER - Responsif */
+    .relawan-header { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        margin-bottom: 30px; 
+        border-bottom: 2px solid var(--border); 
+        padding-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    .page-title { color: var(--navy); font-weight: 800; margin: 0; text-transform: uppercase; font-size: 1.25rem; }
+    .page-subtitle { color: var(--text-muted); font-size: 0.85rem; margin: 5px 0 0; }
+    
+    .btn-add-relawan { 
+        background: var(--red); color: white; padding: 12px 20px; 
+        border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 0.85rem;
+        transition: 0.3s; box-shadow: 0 4px 6px rgba(211, 47, 47, 0.2);
+        display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-add-relawan:hover { background: var(--navy); transform: translateY(-2px); color: white; }
+
+    /* GRID - Responsif */
+    .relawan-grid { 
+        display: grid; 
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+        gap: 20px; 
+    }
+
+    /* CARD DESIGN */
+    .relawan-card {
+        background: white; border-radius: 12px; border: 1px solid var(--border);
+        overflow: hidden; transition: 0.3s; display: flex; flex-direction: column;
+        height: 100%;
+    }
+    .relawan-card:hover { border-color: var(--red); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+
+    .card-top { padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border-bottom: 1px solid var(--border); }
+    .kecamatan-badge { background: var(--navy); color: white; padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+    
+    .status-indicator { width: 10px; height: 10px; border-radius: 50%; }
+    .status-indicator.active { background: #10b981; box-shadow: 0 0 8px #10b981; }
+    .status-indicator.inactive { background: #cbd5e1; }
+
+    .card-body { padding: 25px 20px; text-align: center; flex-grow: 1; }
+    .user-avatar { 
+        width: 65px; height: 65px; background: #eff6ff; color: var(--navy); 
+        border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+        margin: 0 auto 15px; font-size: 1.8rem; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    .card-body h4 { margin: 0; color: var(--text-dark); font-size: 1.1rem; font-weight: 700; }
+    .username { color: var(--red); font-size: 0.85rem; font-weight: 600; margin: 4px 0 15px; }
+
+    .contact-info { text-align: left; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #f1f5f9; }
+    .info-item { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; color: var(--text-dark); font-size: 0.8rem; }
+    .info-item:last-child { margin-bottom: 0; }
+    .info-item i { color: var(--navy); width: 16px; text-align: center; }
+
+    .card-footer { 
+        padding: 12px; display: flex; justify-content: center; gap: 10px; 
+        border-top: 1px solid var(--border); background: #f8fafc;
+    }
+
+    .btn-icon { 
+        width: 38px; height: 38px; border-radius: 8px; border: 1px solid var(--border);
+        background: white; cursor: pointer; transition: 0.2s; color: var(--text-muted);
+        display: flex; align-items: center; justify-content: center; text-decoration: none;
+    }
+    .btn-icon:hover { background: var(--navy); color: white; border-color: var(--navy); }
+    .btn-icon.delete:hover { background: var(--red); border-color: var(--red); color: white; }
+
+    /* RESPONSIVE MOBILE */
+    @media (max-width: 600px) {
+        .relawan-wrapper { padding: 15px; }
+        .relawan-header { text-align: center; justify-content: center; }
+        .header-left { width: 100%; }
+        .btn-add-relawan { width: 100%; justify-content: center; }
+        .relawan-grid { grid-template-columns: 1fr; }
+    }
+</style>
+
+<div class="relawan-wrapper">
+    <header class="relawan-header">
+        <div class="header-left">
+            <h3 class="page-title">Daftar Relawan Lapangan</h3>
+            <p class="page-subtitle">Total: <strong>{{ relawan|length }}</strong> personil terdaftar</p>
+        </div>
+        <a href="{{ url_for('admin.tambah_relawan_admin') }}" class="btn-add-relawan">
+            <i class="fas fa-user-plus"></i> Daftarkan Relawan
+        </a>
+    </header>
+
+    <section class="relawan-grid">
+        {% for r in relawan %}
+        <div class="relawan-card">
+            <div class="card-top">
+                <span class="kecamatan-badge">{{ r.nama_kecamatan }}</span>
+                <div class="status-indicator {{ 'active' if r.status == 'Aktif' else 'inactive' }}" title="Status: {{ r.status }}"></div>
+            </div>
+            
+            <div class="card-body">
+                <div class="user-avatar">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h4>{{ r.nama_relawan }}</h4>
+                <p class="username">@{{ r.username }}</p>
+                
+                <div class="contact-info">
+                    <div class="info-item">
+                        <i class="fab fa-whatsapp"></i>
+                        <span>{{ r.no_hp }}</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="far fa-envelope"></i>
+                        <span>{{ r.email if r.email else '-' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer">
+                <a href="{{ url_for('admin.edit_relawan_admin', id=r.id_relawan) }}" class="btn-icon" title="Edit Data">
+                    <i class="fas fa-pen"></i>
+                </a>
+                
+                <a href="{{ url_for('admin.konfirmasi_hapus_relawan', id=r.id_relawan) }}" class="btn-icon delete" title="Nonaktifkan">
+                    <i class="fas fa-user-slash"></i>
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <div style="grid-column: 1/-1; text-align: center; padding: 50px; color: var(--text-muted);">
+            <i class="fas fa-users-slash fa-3x" style="margin-bottom: 15px; opacity: 0.3;"></i>
+            <p>Belum ada data relawan lapangan.</p>
+        </div>
+        {% endfor %}
+    </section>
+</div>
+{% endblock %}

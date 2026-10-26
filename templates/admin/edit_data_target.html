@@ -1,0 +1,99 @@
+{% extends 'admin/layout_admin.html' %}
+
+{% block title %}Edit Target Wilayah - {{ data.nama_kecamatan }}{% endblock %}
+
+{% block content %}
+<style>
+    .edit-container { padding: 40px 20px; display: flex; justify-content: center; font-family: 'Inter', sans-serif; }
+    
+    .edit-card { 
+        background: white; width: 100%; max-width: 550px; padding: 30px; 
+        border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        border-top: 6px solid #1a237e; /* Navy accent sesuai layout */
+    }
+
+    .edit-header { margin-bottom: 25px; border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; }
+    .edit-header h3 { color: #1a237e; margin: 0; font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+    .edit-header p { color: #64748b; font-size: 0.85rem; margin-top: 5px; }
+    
+    .form-group { margin-bottom: 20px; }
+    .form-group label { font-weight: 700; margin-bottom: 8px; font-size: 0.85rem; color: #1e293b; display: block; }
+    
+    /* Input Style */
+    .form-control-static {
+        background: #f8fafc; color: #64748b; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-weight: 600;
+    }
+
+    .form-control-input {
+        width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; outline: none; transition: 0.3s; font-size: 1rem;
+    }
+    .form-control-input:focus { border-color: #1a237e; box-shadow: 0 0 0 4px rgba(26, 35, 126, 0.1); }
+
+    /* Button Group */
+    .btn-group-action { display: flex; gap: 12px; margin-top: 30px; }
+    
+    .btn-save {
+        flex: 2; padding: 12px; background: #1a237e; color: white; border: none;
+        border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.3s;
+    }
+    .btn-save:hover { background: #d32f2f; transform: translateY(-2px); }
+
+    .btn-cancel {
+        flex: 1; padding: 12px; background: #f1f5f9; color: #475569; border: none;
+        border-radius: 8px; font-weight: 700; text-align: center; text-decoration: none; transition: 0.3s;
+    }
+    .btn-cancel:hover { background: #e2e8f0; }
+
+    /* Info Box */
+    .alert-info-edit {
+        background: #eff6ff; padding: 12px; border-radius: 8px; border-left: 4px solid #3b82f6;
+        color: #1e40af; font-size: 0.8rem; margin-bottom: 20px;
+    }
+
+    @media (max-width: 480px) {
+        .edit-container { padding: 20px 10px; }
+        .btn-group-action { flex-direction: column; }
+    }
+</style>
+
+<div class="edit-container">
+    <div class="edit-card">
+        <div class="edit-header">
+            <h3><i class="fas fa-edit"></i> Edit Target Suara</h3>
+            <p>Perbarui target perolehan suara untuk wilayah strategis.</p>
+        </div>
+
+        <div class="alert-info-edit">
+            <i class="fas fa-info-circle"></i> Mengubah angka ini akan langsung mengupdate persentase progress di Dashboard Utama.
+        </div>
+
+        <form action="{{ url_for('admin.edit_target', id_kecamatan=data.id_kecamatan) }}" method="POST">
+            
+            <div class="form-group">
+                <label>Nama Kecamatan</label>
+                <div class="form-control-static">
+                    <i class="fas fa-map-marker-alt" style="margin-right: 8px;"></i> {{ data.nama_kecamatan }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="target_suara">Jumlah Target Suara</label>
+                <input type="number" 
+                       id="target_suara" 
+                       name="target_suara" 
+                       class="form-control-input" 
+                       value="{{ data.target }}" 
+                       placeholder="Contoh: 2500" 
+                       required>
+            </div>
+
+            <div class="btn-group-action">
+                <a href="{{ url_for('admin.data_target') }}" class="btn-cancel">Batal</a>
+                <button type="submit" class="btn-save">
+                    Simpan Perubahan <i class="fas fa-check-circle" style="margin-left: 5px;"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,129 @@
+{% extends 'admin/layout_admin.html' %}
+
+{% block content %}
+<style>
+    :root {
+        --navy: #1a237e;
+        --red: #d32f2f;
+        --border: #e2e8f0;
+        --text-dark: #334155;
+        --text-muted: #94a3b8;
+    }
+
+    /* Font Sans-Serif agar membulat seperti Database Konstituen */
+    .dashboard-content { 
+        padding: 20px; 
+        font-family: 'Inter', -apple-system, sans-serif; 
+    }
+
+    /* Header Polos tanpa garis merah */
+    .dashboard-header-clean { margin-bottom: 25px; }
+    .page-title-clean { 
+        color: var(--navy); 
+        font-weight: 800; 
+        text-transform: uppercase; 
+        font-size: 1.25rem; 
+        letter-spacing: 0.5px;
+    }
+
+    .instruction-list { display: flex; flex-direction: column; gap: 12px; }
+
+    /* Card Style sesuai referensi */
+    .ins-card {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        position: relative;
+    }
+
+    /* Baris Atas: Tanggal & Kategori */
+    .ins-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .ins-date {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    .ins-category {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--navy);
+        text-transform: uppercase;
+    }
+
+    /* Isi Pesan */
+    .ins-body {
+        margin: 0;
+        font-size: 1rem;
+        color: var(--text-dark);
+        line-height: 1.5;
+        font-weight: 500;
+        white-space: pre-line;
+    }
+
+    /* Tombol Hapus di Pojok Kanan Bawah */
+    .ins-footer {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 5px;
+    }
+
+    .btn-delete-link {
+        background: none;
+        border: none;
+        color: #7a869a; /* Warna abu-abu seperti di gambar */
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+        padding: 0;
+    }
+
+    .btn-delete-link:hover {
+        color: var(--red);
+        text-decoration: underline;
+    }
+
+    .empty-text { text-align: center; color: var(--text-muted); padding: 50px 0; }
+</style>
+
+<div class="dashboard-content">
+    <header class="dashboard-header-clean">
+        <h3 class="page-title-clean">Riwayat Instruksi Terkirim</h3>
+    </header>
+
+    <div class="instruction-list">
+        {% for ins in riwayat_instruksi %}
+        <div class="ins-card">
+            <div class="ins-header">
+                <div class="ins-date">{{ ins.tanggal_kirim }}</div>
+                <div class="ins-category">{{ ins.kategori|upper }}</div>
+            </div>
+            
+            <div class="ins-body">
+                {{ ins.isi_pesan }}
+            </div>
+
+            <div class="ins-footer">
+                <a href="{{ url_for('admin.hapus_instruksi', id=ins.id_instruksi, asal='riwayat') }}" class="btn-delete-link">
+                    Hapus
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-text">
+            <p>Belum ada instruksi yang dikirimkan.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

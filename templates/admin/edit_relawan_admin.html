@@ -1,0 +1,129 @@
+{% extends 'admin/layout_admin.html' %}
+
+{% block title %}Edit Data Relawan - Admin Panel{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --navy: #1a237e;
+        --red: #d32f2f;
+        --border: #e2e8f0;
+        --text-dark: #334155;
+        --bg-light: #f8fafc;
+    }
+
+    .form-wrapper { padding: 40px 20px; display: flex; justify-content: center; font-family: 'Inter', sans-serif; }
+    
+    .form-card { 
+        background: white; width: 100%; max-width: 700px; 
+        padding: 35px; border-radius: 12px; border-top: 6px solid var(--navy);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    }
+
+    .form-header { border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 25px; }
+    .form-header h3 { color: var(--navy); margin: 0; font-weight: 800; text-transform: uppercase; font-size: 1.3rem; }
+    .form-header p { color: #64748b; font-size: 0.85rem; margin-top: 5px; }
+
+    .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    
+    .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
+    .form-group label { font-weight: 700; font-size: 0.85rem; color: var(--text-dark); }
+    
+    .form-group input, .form-group select { 
+        padding: 12px; border: 1px solid var(--border); border-radius: 8px; 
+        outline: none; transition: 0.2s; font-size: 0.95rem; background: white;
+    }
+    
+    .form-group input:focus, .form-group select:focus { 
+        border-color: var(--navy); box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.1); 
+    }
+
+    .form-group input[readonly] { background: var(--bg-light); cursor: not-allowed; color: #94a3b8; }
+
+    .full-width { grid-column: span 2; }
+
+    .password-box { 
+        background: #fff7ed; color: #9a3412; padding: 15px; 
+        border-radius: 8px; margin-top: 15px; font-size: 0.85rem; 
+        border: 1px solid #fed7aa;
+    }
+
+    .form-footer { 
+        display: flex; justify-content: flex-end; gap: 15px; 
+        margin-top: 30px; padding-top: 20px; border-top: 1px solid #f1f5f9;
+    }
+
+    .btn-back { 
+        padding: 12px 20px; text-decoration: none; color: #64748b; 
+        font-weight: 700; font-size: 0.9rem; transition: 0.2s;
+    }
+    .btn-back:hover { color: var(--navy); }
+
+    .btn-submit { 
+        padding: 12px 25px; background: var(--navy); color: white; 
+        border: none; border-radius: 8px; font-weight: 700; 
+        cursor: pointer; transition: 0.3s; font-size: 0.9rem;
+    }
+    .btn-submit:hover { background: var(--red); transform: translateY(-2px); }
+
+    @media (max-width: 600px) {
+        .form-wrapper { padding: 20px 15px; }
+        .input-grid { grid-template-columns: 1fr; }
+        .full-width { grid-column: span 1; }
+        .form-footer { flex-direction: column-reverse; }
+        .btn-submit, .btn-back { width: 100%; text-align: center; }
+    }
+</style>
+
+<div class="form-wrapper">
+    <div class="form-card">
+        <div class="form-header">
+            <h3><i class="fas fa-user-edit"></i> Edit Data Relawan</h3>
+            <p>Perbarui informasi personil lapangan untuk wilayah tugas terkait.</p>
+        </div>
+
+        <form action="{{ url_for('admin.edit_relawan_admin', id=relawan.id_relawan) }}" method="POST">
+            <div class="input-grid">
+                <div class="form-group">
+                    <label>Nama Lengkap</label>
+                    <input type="text" name="nama" value="{{ relawan.nama_relawan }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Nomor WhatsApp</label>
+                    <input type="text" name="no_hp" value="{{ relawan.no_hp }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" name="username" value="{{ relawan.username }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Wilayah Tugas</label>
+                    <select name="id_kecamatan" required>
+                        {% for k in kecamatans %}
+                        <option value="{{ k.id_kecamatan }}" {{ 'selected' if k.id_kecamatan == relawan.id_kecamatan else '' }}>
+                            {{ k.nama_kecamatan }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group full-width">
+                    <label>Email</label>
+                    <input type="email" name="email" value="{{ relawan.email if relawan.email else '' }}">
+                </div>
+            </div>
+            
+            <div class="password-box">
+                <i class="fas fa-key"></i> 
+                <span>Kosongkan kolom <b>Reset Password</b> jika tidak ingin mengubah password relawan.</span>
+                <input type="password" name="new_password" placeholder="Masukkan password baru (Opsional)" 
+                       style="width: 100%; margin-top: 10px; padding: 10px; border-radius: 6px; border: 1px solid #fdba74;">
+            </div>
+
+            <div class="form-footer">
+                <a href="{{ url_for('admin.manajemen_relawan_admin') }}" class="btn-back">Batal</a>
+                <button type="submit" class="btn-submit">Simpan Perubahan</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

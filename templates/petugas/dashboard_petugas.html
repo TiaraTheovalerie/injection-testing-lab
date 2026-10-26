@@ -1,0 +1,205 @@
+{% extends 'petugas/layout_petugas.html' %}
+
+{% block title %}Posko Depan - Dashboard Petugas Lapangan{% endblock %}
+
+{% block content %}
+<style>
+    /* VARIABLES & RESET */
+    :root {
+        --navy: #1a237e; 
+        --red: #d32f2f;
+        --green: #2e7d32;
+        --light-bg: #f8fafc;
+        --border-color: #e2e8f0;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+    }
+
+    .dashboard-wrapper {
+        padding: 20px;
+        font-family: 'Inter', 'Segoe UI', sans-serif;
+    }
+
+    /* HEADER */
+    .dashboard-header {
+        margin-bottom: 30px;
+        border-left: 6px solid var(--red); 
+        padding-left: 20px;
+    }
+
+    .page-title {
+        color: var(--navy);
+        font-weight: 800;
+        font-size: 1.5rem;
+        margin: 0;
+        text-transform: uppercase;
+    }
+
+    /* STATS GRID */
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 35px;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 25px;
+        border: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 2px;
+        transition: 0.3s ease;
+    }
+
+    .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+    .border-navy { border-top: 4px solid var(--navy); }
+    .border-green { border-top: 4px solid var(--green); }
+    .border-red { border-top: 4px solid var(--red); }
+
+    .stat-label { font-size: 0.75rem; font-weight: 800; color: var(--text-muted); }
+    .stat-number { font-size: 2.2rem; font-weight: 900; color: var(--navy); margin: 10px 0; }
+    .stat-sub { font-size: 0.8rem; color: var(--text-muted); }
+    .stat-visual i { font-size: 3rem; color: var(--navy); opacity: 0.1; }
+
+    /* PROGRESS BAR */
+    .progress-bar-container { background: #f1f5f9; height: 10px; border-radius: 5px; margin: 12px 0; width: 100%; }
+    .progress-fill { background: var(--green); height: 100%; border-radius: 5px; }
+
+    .alert-badge { background: var(--red); color: white; padding: 4px 12px; font-size: 0.7rem; font-weight: 800; border-radius: 20px; }
+    .pulse { animation: shadow-pulse 2s infinite; }
+    @keyframes shadow-pulse { 0% { box-shadow: 0 0 0 0px rgba(211, 47, 47, 0.4); } 100% { box-shadow: 0 0 0 10px rgba(211, 47, 47, 0); } }
+
+    /* COMMAND PANEL */
+    .command-panel {
+        background: white;
+        border: 1px solid var(--border-color);
+        padding: 30px;
+    }
+
+    .panel-header h4 {
+        color: var(--navy);
+        font-weight: 800;
+        margin-bottom: 20px;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* AREA INSTRUKSI TERBARU */
+    .command-input-area { background: var(--light-bg); border: 2px dashed #cbd5e1; padding: 25px; margin-bottom: 30px; }
+    
+    .instruction-label {
+        font-size: 0.7rem;
+        font-weight: 800;
+        color: var(--red); 
+        text-transform: uppercase;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .instruction-text {
+        font-size: 1.1rem;
+        font-weight: 500;
+        line-height: 1.6;
+        color: var(--text-main);
+        /* SOLUSI AGAR ENTER BERFUNGSI */
+        white-space: pre-line; 
+    }
+
+    .separator { height: 1px; background: var(--border-color); margin: 30px 0; }
+
+    /* HISTORY LIST */
+    .history-card { padding: 20px; border: 1px solid var(--border-color); margin-bottom: 15px; background: white; }
+    .history-card.urgent { border-left: 6px solid var(--red); }
+    .history-card.info { border-left: 6px solid #3b82f6; }
+
+    .card-meta { display: flex; justify-content: space-between; margin-bottom: 12px; }
+    .time-stamp { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
+    
+    .tag-urgent { background: var(--red); color: white; font-size: 0.6rem; font-weight: 900; padding: 2px 8px; }
+    .tag-info { background: #3b82f6; color: white; font-size: 0.6rem; font-weight: 900; padding: 2px 8px; }
+
+    .card-content { 
+        font-size: 0.95rem; 
+        line-height: 1.6; 
+        color: var(--text-main);
+        /* SOLUSI AGAR ARSIP JUGA RAPI KE BAWAH */
+        white-space: pre-line; 
+    }
+</style>
+
+<div class="dashboard-wrapper">
+    <header class="dashboard-header">
+        <h3 class="page-title">Pusat Kendali Petugas</h3>
+    </header>
+
+    <section class="stats-container">
+        <div class="stat-card border-navy">
+            <div class="stat-main">
+                <span class="stat-label">TARGET SUARA</span>
+                <h2 class="stat-number">{{ "{:,}".format(target|default(0)) }}</h2>
+                <span class="stat-sub">Wilayah Tugas Anda</span>
+            </div>
+            <div class="stat-visual"><i class="fas fa-bullseye"></i></div>
+        </div>
+    
+        <div class="stat-card border-green">
+            <div class="stat-main">
+                <span class="stat-label">DUKUNGAN MASUK</span>
+                <h2 class="stat-number">{{ "{:,}".format(realisasi) }}</h2>
+                <div class="progress-bar-container">
+                    <div class="progress-fill" style="width: {{ persen }}%;"></div>
+                </div>
+                <span class="stat-sub">{{ persen }}% dari Target Terpenuhi</span>
+            </div>
+            <div class="stat-visual"><i class="fas fa-id-card"></i></div>
+        </div>
+    
+        <div class="stat-card border-red">
+            <div class="stat-main">
+                <span class="stat-label">H-VOTING DAY</span>
+                <h2 class="stat-number">45</h2>
+                <span class="alert-badge pulse">SIAGA SATU</span>
+            </div>
+            <div class="stat-visual"><i class="fas fa-clock"></i></div>
+        </div>
+    </section>
+
+    <section class="command-panel">
+        <div class="command-input-area">
+            <div class="panel-header" style="border: none; padding: 0;">
+                <h4 style="margin-bottom: 10px;"><i class="fas fa-broadcast-tower"></i> INSTRUKSI TERBARU PUSAT</h4>
+            </div>
+            {% if terbaru %}
+                <span class="instruction-label">Diterima: {{ terbaru.tanggal_kirim.strftime('%H:%M WIB - %d %b') }}</span>
+                <p class="instruction-text">{{ terbaru.isi_pesan }}</p>
+            {% else %}
+                <p class="instruction-text">Belum ada instruksi masuk.</p>
+            {% endif %}
+        </div>
+    
+        <div class="separator"></div>
+    
+        <div class="command-history-area">
+            <div class="panel-header">
+                <h4><i class="fas fa-history"></i> ARSIP INSTRUKSI SEBELUMNYA</h4>
+            </div>
+            <div class="history-list">
+                {% for item in arsip %}
+                <article class="history-card {{ 'urgent' if item.kategori == 'urgent' else 'info' }}">
+                    <div class="card-meta">
+                        <span class="time-stamp"><i class="far fa-clock"></i> {{ item.tanggal_kirim.strftime('%d %b, %H:%M') }}</span>
+                        <span class="tag-{{ item.kategori }}">{{ item.kategori|upper }}</span>
+                    </div>
+                    <div class="card-content">{{ item.isi_pesan }}</div>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

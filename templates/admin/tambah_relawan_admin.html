@@ -1,0 +1,125 @@
+{% extends 'admin/layout_admin.html' %}
+
+{% block title %}Tambah Relawan - Admin Panel{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --navy: #1a237e;
+        --red: #d32f2f;
+        --border: #e2e8f0;
+        --text-dark: #334155;
+    }
+
+    .form-wrapper { padding: 40px 20px; display: flex; justify-content: center; font-family: 'Inter', sans-serif; }
+    
+    .form-card { 
+        background: white; width: 100%; max-width: 700px; 
+        padding: 35px; border-radius: 12px; border-top: 6px solid var(--navy);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    }
+
+    .form-header { border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 25px; }
+    .form-header h3 { color: var(--navy); margin: 0; font-weight: 800; text-transform: uppercase; font-size: 1.3rem; }
+    .form-header p { color: #64748b; font-size: 0.85rem; margin-top: 5px; }
+
+    .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    
+    .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
+    .form-group label { font-weight: 700; font-size: 0.85rem; color: var(--text-dark); }
+    
+    .form-group input, .form-group select { 
+        padding: 12px; border: 1px solid var(--border); border-radius: 8px; 
+        outline: none; transition: 0.2s; font-size: 0.95rem;
+    }
+    
+    .form-group input:focus, .form-group select:focus { 
+        border-color: var(--navy); box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.1); 
+    }
+
+    .full-width { grid-column: span 2; }
+
+    .info-box { 
+        background: #eff6ff; color: #1e40af; padding: 15px; 
+        border-radius: 8px; margin-top: 15px; font-size: 0.85rem; 
+        border: 1px solid #bfdbfe; display: flex; align-items: center; gap: 10px;
+    }
+
+    .form-footer { 
+        display: flex; justify-content: flex-end; gap: 15px; 
+        margin-top: 30px; padding-top: 20px; border-top: 1px solid #f1f5f9;
+    }
+
+    .btn-back { 
+        padding: 12px 20px; text-decoration: none; color: #64748b; 
+        font-weight: 700; font-size: 0.9rem; transition: 0.2s;
+    }
+    .btn-back:hover { color: var(--navy); }
+
+    .btn-submit { 
+        padding: 12px 25px; background: var(--navy); color: white; 
+        border: none; border-radius: 8px; font-weight: 700; 
+        cursor: pointer; transition: 0.3s; font-size: 0.9rem;
+    }
+    .btn-submit:hover { background: var(--red); transform: translateY(-2px); }
+
+    /* RESPONSIVE LAYOUT */
+    @media (max-width: 600px) {
+        .form-wrapper { padding: 20px 15px; }
+        .input-grid { grid-template-columns: 1fr; }
+        .full-width { grid-column: span 1; }
+        .form-footer { flex-direction: column-reverse; }
+        .btn-submit, .btn-back { width: 100%; text-align: center; }
+    }
+</style>
+
+<div class="form-wrapper">
+    <div class="form-card">
+        <div class="form-header">
+            <h3><i class="fas fa-user-plus"></i> Daftarkan Relawan Baru</h3>
+            <p>Relawan yang didaftarkan akan otomatis memiliki akses login sebagai <b>Petugas</b>.</p>
+        </div>
+
+        <form action="{{ url_for('admin.tambah_relawan_admin') }}" method="POST">   
+            <div class="input-grid">
+                <div class="form-group">
+                    <label>Nama Lengkap Relawan</label>
+                    <input type="text" name="nama" placeholder="Contoh: Ahmad Subarjo" required>
+                </div>
+                <div class="form-group">
+                    <label>Nomor WhatsApp</label>
+                    <input type="text" name="no_hp" placeholder="0812xxxxxxxx" required>
+                </div>
+                <div class="form-group">
+                    <label>Username Login</label>
+                    <input type="text" name="username" placeholder="username_relawan" required>
+                </div>
+                <div class="form-group">
+                    <label>Wilayah Tugas (Kecamatan)</label>
+                    <select name="id_kecamatan" required>
+                        <option value="" disabled selected>-- Pilih Wilayah --</option>
+                        {% for k in kecamatans %}
+                        <option value="{{ k.id_kecamatan }}">{{ k.nama_kecamatan }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group full-width" style="margin-top: 15px;">
+                <label>Email (Opsional)</label>
+                <input type="email" name="email" placeholder="email@example.com">
+            </div>
+
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i> 
+                <span>Password sementara relawan adalah: <b>relawan123</b></span>
+            </div>
+
+            <div class="form-footer">
+                <a href="{{ url_for('admin.manajemen_relawan_admin') }}" class="btn-back">Batal</a>
+                <button type="submit" class="btn-submit">Daftarkan Sekarang</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

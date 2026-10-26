@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Pusat Komando Pemenangan{% endblock %}</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+          --primary-red: #b91c1c;
+          --navy-sidebar: #1e1b4b; /* Navy Solid sesuai request */
+          --gold-win: #fbbf24;   
+          --white: #ffffff;
+          --bg-light: #f1f5f9;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Roboto', sans-serif;
+          background-color: var(--bg-light);
+          display: flex;
+          min-height: 100vh;
+          flex-direction: column;
+        }
+
+        /* --- DESKTOP LAYOUT --- */
+        @media (min-width: 992px) {
+            body { flex-direction: row; }
+            aside {
+                width: 280px;
+                position: fixed;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
+            main { margin-left: 280px; }
+            .mobile-logout { display: none !important; }
+        }
+
+        /* --- SIDEBAR STYLE (NAVY SOLID) --- */
+        aside {
+          background: var(--navy-sidebar);
+          color: var(--white);
+          z-index: 100;
+          box-shadow: 4px 0 10px rgba(0,0,0,0.2);
+        }
+
+        .caleg-profile {
+          padding: 2rem 1.5rem;
+          text-align: center;
+          border-bottom: 2px solid var(--gold-win);
+        }
+
+        .caleg-photo {
+          width: 80px; height: 80px;
+          border-radius: 50%;
+          border: 3px solid var(--gold-win);
+          margin-bottom: 1rem;
+          object-fit: cover;
+        }
+
+        .caleg-info h2 { 
+          font-family: 'Montserrat', sans-serif; 
+          font-size: 1rem; 
+          text-transform: uppercase; 
+        }
+
+        .caleg-info p { 
+          font-size: 0.7rem; 
+          color: var(--gold-win); 
+          font-weight: 700; 
+          margin-top: 5px; 
+        }
+
+        /* --- NAVIGASI --- */
+        nav { padding: 1rem 0; flex-grow: 1; display: flex; flex-direction: column; }
+
+        nav a {
+          display: flex; align-items: center;
+          padding: 1rem 1.5rem;
+          color: #cbd5e1;
+          text-decoration: none;
+          font-weight: 500;
+          transition: 0.3s;
+          border-left: 5px solid transparent;
+        }
+
+        nav a i { width: 30px; font-size: 1.1rem; }
+
+        /* Menu Aktif / Hover (Berubah Warna) */
+        nav a:hover, nav a.active {
+          background: rgba(255, 255, 255, 0.1);
+          color: var(--white);
+          border-left: 5px solid var(--primary-red);
+        }
+
+        /* --- TOMBOL KELUAR (FIXED) --- */
+        .logout-container {
+            padding: 1.5rem;
+            margin-top: auto; /* Dorong ke paling bawah */
+        }
+
+        .logout-btn {
+          background: var(--gold-win);
+          color: var(--navy-sidebar) !important;
+          border-radius: 6px;
+          font-weight: 800 !important;
+          text-decoration: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0.8rem;
+          transition: 0.3s;
+          border: none !important; /* Hapus semua border default */
+          outline: none;
+        }
+
+        /* Hover Tombol Keluar jadi Merah */
+        .logout-btn:hover {
+          background: var(--primary-red) !important;
+          color: var(--white) !important;
+          border-left: none !important; /* Pastikan tidak ada garis kuning */
+          box-shadow: 0 4px 12px rgba(185, 28, 28, 0.4);
+        }
+
+        /* --- CONTENT --- */
+        main { flex-grow: 1; width: 100%; }
+        .container-fluid { padding: 2rem; }
+        .content-card {
+          background: white;
+          box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+          border-radius: 10px;
+          padding: 2rem;
+          min-height: 80vh;
+        }
+
+        footer { padding: 1.5rem; text-align: center; color: #94a3b8; font-size: 0.75rem; }
+
+        /* RESPONSIVE MOBILE */
+        @media (max-width: 991px) {
+          aside { position: static; width: 100%; height: auto; }
+          .caleg-profile { padding: 1rem; display: flex; align-items: center; justify-content: space-between; }
+          .profile-flex { display: flex; align-items: center; gap: 10px; }
+          .caleg-photo { width: 50px; height: 50px; margin-bottom: 0; }
+          nav { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 5px; padding: 0.5rem; }
+          nav a { border-left: none !important; border-bottom: 4px solid transparent; padding: 0.8rem; font-size: 0.75rem; }
+          nav a.active { border-bottom: 4px solid var(--primary-red); }
+          .logout-container { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <aside>
+        <div class="caleg-profile">
+            <div class="profile-flex">
+                <img src="https://ui-avatars.com/api/?name={{ session.nama }}&background=fbbf24&color=1e1b4b" alt="Foto" class="caleg-photo">
+                <div class="caleg-info">
+                    <h2>{{ session.nama }}</h2>
+                    <p>KONTROL ADMIN 2029-2034</p>
+                </div>
+            </div>
+            <a href="{{ url_for('logout') }}" class="logout-btn mobile-logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+        </div>
+
+        <nav>
+            <a href="{{ url_for('admin.dashboard') }}" class="menu-item {{ 'active' if request.endpoint in ['admin.dashboard', 'admin.riwayat_instruksi_admin'] else '' }}">
+                <i class="fas fa-home"></i> <span>DASHBOARD</span>
+            </a>
+            
+            <a href="{{ url_for('admin.data_konstituen_admin') }}" 
+               class="menu-item {{ 'active' if request.endpoint in ['admin.data_konstituen_admin', 'admin.tambah_data_konstituen_admin', 'admin.edit_konstituen_admin', 'admin.konfirmasi_hapus_konstituen'] else '' }}">
+                <i class="fas fa-users"></i>
+                <span>DATA KONSTITUEN</span>
+            </a>
+            <a href="{{ url_for('admin.manajemen_relawan_admin') }}" class="menu-item {{ 'active' if request.endpoint in ['admin.manajemen_relawan_admin', 'admin.konfirmasi_hapus_relawan', 'admin.tambah_relawan_admin', 'admin.edit_relawan_admin'] else '' }}">
+                <i class="fas fa-user-cog"></i> <span>REKRUTMEN RELAWAN</span>
+            </a>
+            <a href="{{ url_for('admin.laporan_statistik_admin') }}" class="{{ 'active' if request.endpoint == 'admin.laporan_statistik_admin' }}">
+                <i class="fas fa-file-alt"></i> <span>LAPORAN & STATISTIK</span>
+            </a>
+            <a href="{{ url_for('admin.data_target') }}" class="menu-item {{ 'active' if request.endpoint in ['admin.data_target', 'admin.edit_target', 'admin.hapus_target'] else '' }}">
+                <i class="fas fa-bullseye"></i> <span>ATUR TARGET SUARA</span>
+            </a>
+            <div class="logout-container">
+                <a href="{{ url_for('logout') }}" class="logout-btn">
+                    <i class="fas fa-power-off"></i> &nbsp; KELUAR
+                </a>
+            </div>
+        </nav>
+    </aside>
+
+    <main>
+        <div class="container-fluid">
+            <div class="content-card">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+        <footer>
+            &copy; 2026 PUSAT KOMANDO PEMENANGAN.
+        </footer>
+    </main>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

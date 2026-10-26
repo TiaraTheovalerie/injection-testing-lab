@@ -1,0 +1,145 @@
+{% extends 'admin/layout_admin.html' %}
+
+{% block title %}Konfirmasi Hapus Relawan - Admin Panel{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --navy: #1a237e;
+        --red: #d32f2f;
+        --border: #e2e8f0;
+        --text-dark: #1e293b;
+        --text-muted: #64748b;
+        --bg-light: #f8fafc;
+    }
+
+    .delete-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px 20px;
+        min-height: 80vh;
+    }
+
+    .delete-card {
+        background: white;
+        width: 100%;
+        max-width: 500px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        text-align: center;
+        overflow: hidden;
+        border-top: 8px solid var(--red);
+    }
+
+    .delete-icon {
+        background: #fff5f5;
+        color: var(--red);
+        font-size: 2.5rem;
+        padding: 30px 0 15px;
+    }
+
+    .delete-content { padding: 0 25px 30px; }
+    .delete-content h3 { 
+        color: var(--navy); 
+        margin-bottom: 10px; 
+        font-weight: 800; 
+        font-family: 'Inter', sans-serif;
+        text-transform: uppercase;
+        font-size: 1.1rem;
+    }
+    .delete-content p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; }
+
+    /* DATA PREVIEW - Identik dengan design yang Anda kirim */
+    .data-preview {
+        background: var(--bg-light);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin-top: 20px;
+        padding: 15px;
+        text-align: left;
+        display: grid;
+        grid-template-columns: 120px 1fr;
+        gap: 8px;
+    }
+
+    .data-preview .label { font-weight: 800; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
+    .data-preview .value { font-weight: 600; font-size: 0.85rem; color: var(--text-dark); word-break: break-word; }
+
+    .delete-actions {
+        display: flex;
+        background: #f1f5f9;
+        padding: 20px 25px;
+        gap: 12px;
+    }
+
+    .btn-cancel, .btn-confirm-delete {
+        flex: 1;
+        padding: 12px;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: 0.2s;
+        text-decoration: none;
+    }
+
+    .btn-cancel {
+        background: white;
+        color: var(--text-muted);
+        border: 1px solid var(--border);
+    }
+    .btn-cancel:hover { background: #e2e8f0; color: var(--navy); }
+
+    .btn-confirm-delete {
+        background: var(--red);
+        color: white;
+        border: none;
+    }
+    .btn-confirm-delete:hover { background: #b91c1c; transform: translateY(-2px); }
+
+    /* RESPONSIVE HP */
+    @media (max-width: 480px) {
+        .delete-container { padding: 20px 15px; }
+        .delete-actions { flex-direction: column-reverse; padding: 15px; }
+        .data-preview { grid-template-columns: 1fr; gap: 4px; }
+        .data-preview .label { font-size: 0.65rem; }
+        .delete-icon { font-size: 2rem; }
+    }
+</style>
+
+<div class="delete-container">
+    <div class="delete-card">
+        <div class="delete-icon">
+            <i class="fas fa-user-slash"></i>
+        </div>
+        
+        <div class="delete-content">
+            <h3>Hapus Akun Relawan</h3>
+            <p>Apakah Anda yakin ingin menghapus relawan ini? Akses login relawan akan dicabut secara permanen, namun data konstituen yang telah diinput tidak akan hilang.</p>
+            
+            <div class="data-preview">
+                <span class="label">Nama Relawan:</span>
+                <span class="value">{{ relawan.nama_relawan }}</span>
+                
+                <span class="label">Username:</span>
+                <span class="value">@{{ relawan.username }}</span>
+
+                <span class="label">Wilayah Tugas:</span>
+                <span class="value">{{ relawan.nama_kecamatan or relawan.wilayah_tugas }}</span>
+
+                <span class="label">Status:</span>
+                <span class="value" style="color: var(--red);">Hapus Permanen</span>
+            </div>
+        </div>
+
+        <form action="{{ url_for('admin.hapus_relawan_eksekusi', id=relawan.id_relawan) }}" method="POST" class="delete-actions">
+            <a href="{{ url_for('admin.manajemen_relawan_admin') }}" class="btn-cancel">Batal</a>
+            <button type="submit" class="btn-confirm-delete">Ya, Hapus Akun</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

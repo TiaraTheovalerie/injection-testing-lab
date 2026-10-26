@@ -1,0 +1,148 @@
+{% extends 'admin/layout_admin.html' %}
+
+{% block title %}Konfirmasi Hapus - Admin Panel{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --navy: #1a237e;
+        --red: #d32f2f;
+        --border: #e2e8f0;
+        --text-dark: #1e293b;
+        --text-muted: #64748b;
+        --bg-light: #f8fafc;
+    }
+
+    .delete-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px 20px;
+        min-height: 80vh;
+    }
+
+    .delete-card {
+        background: white;
+        width: 100%;
+        max-width: 500px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        text-align: center;
+        overflow: hidden;
+        border-top: 8px solid var(--red);
+    }
+
+    .delete-icon {
+        background: #fff5f5;
+        color: var(--red);
+        font-size: 2.5rem;
+        padding: 30px 0 15px;
+    }
+
+    .delete-content { padding: 0 25px 30px; }
+    .delete-content h3 { 
+        color: var(--navy); 
+        margin-bottom: 10px; 
+        font-weight: 800; 
+        font-family: 'Inter', sans-serif;
+        text-transform: uppercase;
+        font-size: 1.1rem;
+    }
+    .delete-content p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; }
+
+    /* DATA PREVIEW - Responsif Grid */
+    .data-preview {
+        background: var(--bg-light);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin-top: 20px;
+        padding: 15px;
+        text-align: left;
+        display: grid;
+        grid-template-columns: 100px 1fr;
+        gap: 8px;
+    }
+
+    .data-preview .label { font-weight: 800; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
+    .data-preview .value { font-weight: 600; font-size: 0.85rem; color: var(--text-dark); word-break: break-word; }
+
+    .delete-actions {
+        display: flex;
+        background: #f1f5f9;
+        padding: 20px 25px;
+        gap: 12px;
+    }
+
+    .btn-cancel, .btn-confirm-delete {
+        flex: 1;
+        padding: 12px;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: 0.2s;
+        text-decoration: none;
+    }
+
+    .btn-cancel {
+        background: white;
+        color: var(--text-muted);
+        border: 1px solid var(--border);
+    }
+    .btn-cancel:hover { background: #e2e8f0; color: var(--navy); }
+
+    .btn-confirm-delete {
+        background: var(--red);
+        color: white;
+        border: none;
+    }
+    .btn-confirm-delete:hover { background: #b91c1c; transform: translateY(-2px); }
+
+    /* RESPONSIVE HP */
+    @media (max-width: 480px) {
+        .delete-container { padding: 20px 15px; }
+        .delete-actions { flex-direction: column-reverse; padding: 15px; }
+        .data-preview { grid-template-columns: 1fr; gap: 4px; }
+        .data-preview .label { font-size: 0.65rem; }
+        .delete-icon { font-size: 2rem; }
+    }
+</style>
+
+<div class="delete-container">
+    <div class="delete-card">
+        <div class="delete-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        
+        <div class="delete-content">
+            <h3>Konfirmasi Hapus</h3>
+            <p>Anda yakin ingin menghapus data instruksi ini? Data yang dihapus tidak dapat dipulihkan kembali.</p>
+            
+            <div class="data-preview">
+                <span class="label">Kategori:</span>
+                <span class="value">{{ ins.kategori|upper }}</span>
+                
+                <span class="label">Tanggal:</span>
+                <span class="value">
+                    {{ ins.tanggal_kirim.strftime('%d %b %Y | %H:%M') if ins.tanggal_kirim else 'Waktu tidak terdata' }}
+                </span>
+
+                <span class="label">Isi Pesan:</span>
+                <span class="value">{{ ins.isi_pesan[:100] }}{% if ins.isi_pesan|length > 100 %}...{% endif %}</span>
+            </div>
+        </div>
+
+        <form action="{{ url_for('admin.hapus_instruksi', id=ins.id_instruksi, asal=asal) }}" method="POST" class="delete-actions">
+            
+            <a href="{{ url_for('admin.riwayat_instruksi_admin' if asal == 'riwayat' else 'admin.dashboard') }}" class="btn-cancel">
+                Batal
+            </a>
+            
+            <button type="submit" class="btn-confirm-delete">Ya, Hapus Permanen</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

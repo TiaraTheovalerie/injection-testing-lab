@@ -1,0 +1,207 @@
+{% extends 'petugas/layout_petugas.html' %}
+
+{% block title %}Daftar Dukungan Wilayah - SIPECAL{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --green-soft: #ecfdf5;
+        --border-color: #e2e8f0;
+        --navy-dark: #0f172a; /* Warna Navy lebih gelap untuk kontras */
+    }
+
+    .stats-container { font-family: 'Roboto', sans-serif; }
+
+    /* Header Section */
+    .wilayah-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .wilayah-title h3 {
+        color: var(--navy-power);
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 800;
+        font-size: 1.3rem;
+        text-transform: uppercase;
+    }
+
+    .wilayah-title p {
+        color: var(--primary-green);
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+
+    /* Cards for Summary */
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .summary-card {
+        background: var(--bg-light);
+        padding: 1.5rem;
+        border-radius: 4px;
+        border-left: 4px solid var(--primary-green);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .summary-card .label {
+        color: #64748b;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+    }
+
+    .summary-card .value {
+        color: var(--navy-power);
+        font-size: 1.5rem;
+        font-weight: 800;
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    /* Table Design */
+    .table-responsive {
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .table-dukungan {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+    }
+
+    /* FIX: Header Tabel Background Navy Gelap agar teks putih terlihat */
+    .table-dukungan thead {
+        background-color: var(--navy-dark) !important;
+    }
+
+    .table-dukungan th {
+        padding: 1rem 1rem;
+        text-align: left;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #ffffff !important; /* Paksa teks header tetap putih */
+        font-weight: 700;
+    }
+
+    .table-dukungan td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border-color);
+        color: var(--navy-power) !important; /* Warna teks isi tabel tetap navy */
+        font-size: 0.9rem;
+    }
+
+    /* FIX HOVER: Agar baris berubah warna tapi teks TETAP navy */
+    .table-dukungan tr:hover td {
+        background-color: #f8fafc !important; /* Warna hover abu-abu sangat muda */
+        color: var(--navy-power) !important; /* Paksa teks tetap navy gelap saat hover */
+        transition: background-color 0.2s ease;
+    }
+
+    /* Progress Bar */
+    .progress-bar-bg {
+        background: #e2e8f0;
+        height: 8px;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-top: 5px;
+    }
+
+    .progress-bar-fill {
+        background: var(--primary-green);
+        height: 100%;
+        border-radius: 10px;
+        transition: width 0.5s ease;
+    }
+
+    .badge-wilayah {
+        background: var(--primary-green);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 700;
+    }
+
+    @media (max-width: 768px) {
+        .wilayah-info { text-align: center; justify-content: center; }
+        .summary-grid { grid-template-columns: 1fr; }
+    }
+</style>
+
+<div class="stats-container">
+    <div class="wilayah-info">
+        <div class="wilayah-title">
+            <h3>Monitoring Dukungan Wilayah</h3>
+            <p><i class="fas fa-map-marked-alt"></i> Area Tugas: {{ kecamatan_nama }}</p>
+        </div>
+        <div class="badge-wilayah">Data Terverifikasi</div>
+    </div>
+
+    <div class="summary-grid">
+        <div class="summary-card">
+            <span class="label">Total Target</span>
+            <span class="value">{{ "{:,}".format(total_target|default(0)) }}</span>
+        </div>
+        <div class="summary-card">
+            <span class="label">Total Konstituen</span>
+            <span class="value">{{ "{:,}".format(total_realisasi|default(0)) }}</span>
+        </div>
+        <div class="summary-card">
+            <span class="label">Persentase Capaian</span>
+            <span class="value">{{ persentase_total|default(0) }}%</span>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" style="width: {{ persentase_total|default(0) }}%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <div style="padding: 10px; background: #f8fafc; font-weight: bold; color: var(--navy-power); border-bottom: 1px solid var(--border-color);">
+            Daftar Pendukung yang Baru Diinput
+        </div>
+        <table class="table-dukungan">
+            <thead>
+                <tr>
+                    <th>Nama Pendukung</th>
+                    <th>NIK</th>
+                    <th>Alamat</th>
+                    <th>Tanggal Input</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in pendukung %}
+                <tr>
+                    <td><strong>{{ p.nama }}</strong></td>
+                    <td>{{ p.nik }}</td>
+                    <td>{{ p.alamat }}</td>
+                    <td>
+                        {% if p.tanggal_input and p.tanggal_input.strftime %}
+                            {{ p.tanggal_input.strftime('%d %b %Y') }}
+                        {% else %}
+                            <span style="color: #94a3b8;">{{ p.tanggal_input if p.tanggal_input else '-' }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="text-align: center; padding: 30px; color: #94a3b8;">Belum ada data dukungan yang diinput.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

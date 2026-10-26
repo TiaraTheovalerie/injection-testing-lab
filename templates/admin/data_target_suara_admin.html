@@ -1,0 +1,142 @@
+{% extends 'admin/layout_admin.html' %}
+
+{% block title %}Data Target Wilayah - Admin Panel{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --navy: #1a237e;
+        --red: #d32f2f;
+        --border: #e2e8f0;
+        --light-bg: #f8fafc;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+    }
+
+    .dashboard-wrapper { padding: 20px; font-family: 'Inter', sans-serif; }
+
+    /* HEADER */
+    .dashboard-header { margin-bottom: 25px; border-left: 6px solid var(--navy); padding-left: 15px; }
+    .page-title { color: var(--navy); font-weight: 800; text-transform: uppercase; margin: 0; }
+    .page-subtitle { color: var(--text-muted); font-size: 0.85rem; }
+
+    /* TOOLBAR */
+    .data-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .btn-add-main {
+        background: var(--navy); color: white; padding: 10px 15px;
+        text-decoration: none; border-radius: 6px; font-weight: bold;
+        font-size: 0.85rem; display: flex; align-items: center; gap: 8px;
+        transition: 0.3s;
+    }
+    .btn-add-main:hover { background: var(--red); color: white; }
+
+    /* TABLE STYLING */
+    .table-container {
+        background: white; border: 1px solid var(--border);
+        overflow-x: auto; border-radius: 8px;
+    }
+    .admin-table { width: 100%; border-collapse: collapse; text-align: left; min-width: 800px; }
+    
+    .admin-table th {
+        background: var(--light-bg); color: var(--navy); padding: 15px;
+        font-size: 0.8rem; font-weight: 800; text-transform: uppercase; 
+        border-bottom: 2px solid var(--border);
+    }
+
+    .text-center { text-align: center !important; }
+
+    .admin-table td { padding: 15px; border-bottom: 1px solid var(--border); font-size: 0.9rem; color: var(--text-main); }
+
+    /* PROGRESS BAR KECIL */
+    .mini-progress { background: #e2e8f0; height: 6px; border-radius: 10px; margin-top: 5px; overflow: hidden; }
+    .mini-fill { background: var(--navy); height: 100%; border-radius: 10px; }
+
+    /* AKSI BUTTONS */
+    .action-flex { display: flex; gap: 8px; justify-content: center; align-items: center; }
+    .btn-action {
+        padding: 6px 12px; border-radius: 4px; font-size: 0.75rem;
+        font-weight: 700; text-decoration: none; display: flex;
+        align-items: center; gap: 5px; transition: 0.2s;
+    }
+    .btn-action.edit { background: #e0e7ff; color: #4338ca; }
+    .btn-action.delete { background: #fee2e2; color: #b91c1c; }
+    .btn-action:hover { opacity: 0.8; transform: translateY(-1px); }
+
+    .table-footer-text { margin-top: 20px; color: var(--text-muted); font-size: 0.75rem; display: flex; gap: 20px; }
+
+    @media (max-width: 600px) {
+        .btn-add-main span, .btn-action span { display: none; } 
+    }
+</style>
+
+<div class="dashboard-wrapper">
+    <header class="dashboard-header">
+        <h3 class="page-title">Monitoring Target Wilayah</h3>
+        <p class="page-subtitle">Pantau perbandingan target dan realisasi suara per kecamatan</p>
+    </header>
+
+    <section class="data-toolbar">
+        <div style="color: var(--text-muted); font-size: 0.85rem;">
+            <i class="fas fa-calendar-alt"></i> Update Terakhir: {{ list_target|length }} Wilayah Terdata
+        </div>
+    </section>
+
+    <section class="table-container">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th width="50">No</th>
+                    <th>Nama Kecamatan</th>
+                    <th class="text-center">Target Suara</th>
+                    <th class="text-center">Realisasi</th>
+                    <th>Progress</th>
+                    <th class="text-center">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in list_target %}
+                {% set persen = (item.realisasi / item.target * 100)|round(1) if item.target > 0 else 0 %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td style="font-weight: 700;">{{ item.nama_kecamatan }}</td>
+                    <td class="text-center">{{ "{:,}".format(item.target) }}</td>
+                    <td class="text-center">
+                        <span style="color: #166534; font-weight: 700;">{{ "{:,}".format(item.realisasi) }}</span>
+                    </td>
+                    <td>
+                        <div style="font-size: 0.75rem; font-weight: 800; color: var(--navy);">{{ persen }}%</div>
+                        <div class="mini-progress">
+                            <div class="mini-fill" style="width: {{ persen if persen <= 100 else 100 }}%;"></div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="action-flex">
+                            <a href="{{ url_for('admin.edit_target', id_kecamatan=item.id_kecamatan) }}" class="btn-action edit">
+                                <i class="fas fa-pen"></i><span>Edit</span>
+                            </a>
+                            <a href="{{ url_for('admin.hapus_target', id_kecamatan=item.id_kecamatan) }}" 
+                               class="btn-action delete">
+                                <i class="fas fa-trash"></i><span>Hapus</span>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <footer class="table-footer-text">
+        <span>Total Target: <strong>{{ "{:,}".format(total_target) }}</strong></span>
+        <span>Total Realisasi: <strong>{{ "{:,}".format(total_realisasi) }}</strong></span>
+    </footer>
+</div>
+{% endblock %}
